@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankAccountTestBVA.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BankAccountTestBVA Coverage Results, BankAccountEPTest Coverage Results, BankAccountEPTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">BankAccountTestBVA.java</span></div><h1>BankAccountTestBVA.java</h1><pre class="source lang-java linenums">import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+
+<span class="fc" id="L5">public class BankAccountTestBVA {</span>
+
+    @BeforeMethod
+    public void setup() {
+        // Reset static state before each test
+<span class="fc" id="L10">        BankAccount.resetState();</span>
+<span class="fc" id="L11">    }</span>
+
+    // Tests for Account Creation (BVA for initial balances)
+
+    @Test
+    public void testCreateAccountMinimumBalanceZero() {
+<span class="fc" id="L17">        BankAccount.Status result = BankAccount.createAccount(0);</span>
+<span class="fc" id="L18">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Account creation with balance 0 should succeed.&quot;);</span>
+<span class="fc" id="L19">    }</span>
+
+    @Test
+    public void testCreateAccountMinimumPositiveBalance() {
+<span class="fc" id="L23">        BankAccount.Status result = BankAccount.createAccount(1);</span>
+<span class="fc" id="L24">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Account creation with balance 1 should succeed.&quot;);</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    public void testCreateAccountNegativeBalance() {
+<span class="fc" id="L29">        BankAccount.Status result = BankAccount.createAccount(-1);</span>
+<span class="fc" id="L30">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Account creation with negative balance should fail.&quot;);</span>
+<span class="fc" id="L31">    }</span>
+
+    // Tests for Deposit (BVA for deposit amounts)
+
+    @Test
+    public void testDepositMinimumValidAmount() {
+<span class="fc" id="L37">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L38">        BankAccount.Status result = BankAccount.deposit(1, 1);</span>
+<span class="fc" id="L39">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Deposit of 1 should succeed.&quot;);</span>
+<span class="fc" id="L40">    }</span>
+
+    @Test
+    public void testDepositInvalidAmountZero() {
+<span class="fc" id="L44">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L45">        BankAccount.Status result = BankAccount.deposit(1, 0);</span>
+<span class="fc" id="L46">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Deposit of 0 should fail.&quot;);</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    public void testDepositInvalidAmountNegative() {
+<span class="fc" id="L51">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L52">        BankAccount.Status result = BankAccount.deposit(1, -1);</span>
+<span class="fc" id="L53">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Deposit of -1 should fail.&quot;);</span>
+<span class="fc" id="L54">    }</span>
+
+    // Tests for Withdrawal (BVA for withdrawal amounts and balances)
+
+    @Test
+    public void testWithdrawMinimumValidAmount() {
+<span class="fc" id="L60">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L61">        BankAccount.Status result = BankAccount.withdraw(1, 1);</span>
+<span class="fc" id="L62">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Withdrawal of 1 should succeed.&quot;);</span>
+<span class="fc" id="L63">    }</span>
+
+    @Test
+    public void testWithdrawExactBalance() {
+<span class="fc" id="L67">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L68">        BankAccount.Status result = BankAccount.withdraw(1, 100);</span>
+<span class="fc" id="L69">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Withdrawal of exact balance should succeed.&quot;);</span>
+<span class="fc" id="L70">    }</span>
+
+    @Test
+    public void testWithdrawExceedingBalance() {
+<span class="fc" id="L74">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L75">        BankAccount.Status result = BankAccount.withdraw(1, 101);</span>
+<span class="fc" id="L76">        assertEquals(result, BankAccount.Status.INSUFFICIENT_FUNDS, &quot;Withdrawal exceeding balance should fail.&quot;);</span>
+<span class="fc" id="L77">    }</span>
+
+    @Test
+    public void testWithdrawInvalidAmountZero() {
+<span class="fc" id="L81">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L82">        BankAccount.Status result = BankAccount.withdraw(1, 0);</span>
+<span class="fc" id="L83">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Withdrawal of 0 should fail.&quot;);</span>
+<span class="fc" id="L84">    }</span>
+
+    @Test
+    public void testWithdrawInvalidAmountNegative() {
+<span class="fc" id="L88">        BankAccount.createAccount(100);</span>
+<span class="fc" id="L89">        BankAccount.Status result = BankAccount.withdraw(1, -1);</span>
+<span class="fc" id="L90">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Withdrawal of -1 should fail.&quot;);</span>
+<span class="fc" id="L91">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

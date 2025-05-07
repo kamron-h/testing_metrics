@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankAccountEPTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BankAccountTestBVA Coverage Results, BankAccountEPTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">BankAccountEPTest.java</span></div><h1>BankAccountEPTest.java</h1><pre class="source lang-java linenums">import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+
+<span class="nc" id="L5">public class BankAccountEPTest {</span>
+
+    @BeforeMethod
+    public void setup() {
+        // Reset static state before each test
+<span class="nc" id="L10">        BankAccount.resetState();</span>
+<span class="nc" id="L11">    }</span>
+
+    @Test
+    public void testCheckBalanceValidAccount() {
+<span class="nc" id="L15">        BankAccount.createAccount(100); // Create account with initial balance</span>
+<span class="nc" id="L16">        Object balance = BankAccount.checkBalance(1); // Check balance</span>
+<span class="nc" id="L17">        assertEquals(balance, 100, &quot;Balance should be 100 for account 1.&quot;);</span>
+<span class="nc" id="L18">    }</span>
+
+    @Test
+    public void testCheckBalanceNonExistentAccount() {
+<span class="nc" id="L22">        Object result = BankAccount.checkBalance(999); // Non-existent account</span>
+<span class="nc" id="L23">        assertEquals(result, BankAccount.Status.ACCOUNT_NOT_FOUND, &quot;Non-existent account should return ACCOUNT_NOT_FOUND.&quot;);</span>
+<span class="nc" id="L24">    }</span>
+
+    @Test
+    public void testCheckBalanceWithEmptyAccounts() {
+<span class="nc" id="L28">        Object result = BankAccount.checkBalance(1); // Check balance when no accounts exist</span>
+<span class="nc" id="L29">        assertEquals(result, BankAccount.Status.ACCOUNT_NOT_FOUND, &quot;Empty accounts map should return ACCOUNT_NOT_FOUND.&quot;);</span>
+<span class="nc" id="L30">    }</span>
+
+    @Test
+    public void testDepositValidAmount() {
+<span class="nc" id="L34">        BankAccount.createAccount(100); // Create account with initial balance</span>
+<span class="nc" id="L35">        BankAccount.Status result = BankAccount.deposit(1, 50);</span>
+<span class="nc" id="L36">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Deposit should succeed.&quot;);</span>
+<span class="nc" id="L37">    }</span>
+
+    @Test
+    public void testDepositInvalidAmountZero() {
+<span class="nc" id="L41">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L42">        BankAccount.Status result = BankAccount.deposit(1, 0);</span>
+<span class="nc" id="L43">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Deposit of zero should be invalid.&quot;);</span>
+<span class="nc" id="L44">    }</span>
+
+    @Test
+    public void testDepositInvalidAmountNegative() {
+<span class="nc" id="L48">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L49">        BankAccount.Status result = BankAccount.deposit(1, -10);</span>
+<span class="nc" id="L50">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Deposit of negative amount should be invalid.&quot;);</span>
+<span class="nc" id="L51">    }</span>
+
+    @Test
+    public void testNonExistentAccountOperations() {
+<span class="nc" id="L55">        BankAccount.Status depositResult = BankAccount.deposit(999, 50);</span>
+<span class="nc" id="L56">        assertEquals(depositResult, BankAccount.Status.ACCOUNT_NOT_FOUND, &quot;Deposit to non-existent account should fail.&quot;);</span>
+
+<span class="nc" id="L58">        BankAccount.Status withdrawResult = BankAccount.withdraw(999, 50);</span>
+<span class="nc" id="L59">        assertEquals(withdrawResult, BankAccount.Status.ACCOUNT_NOT_FOUND, &quot;Withdrawal from non-existent account should fail.&quot;);</span>
+<span class="nc" id="L60">    }</span>
+
+    @Test
+    public void testWithdrawValidAmount() {
+<span class="nc" id="L64">        BankAccount.createAccount(100); // Create account with initial balance</span>
+<span class="nc" id="L65">        BankAccount.Status result = BankAccount.withdraw(1, 50);</span>
+<span class="nc" id="L66">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Withdrawal should succeed.&quot;);</span>
+<span class="nc" id="L67">    }</span>
+
+    @Test
+    public void testWithdrawExactBalance() {
+<span class="nc" id="L71">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L72">        BankAccount.Status result = BankAccount.withdraw(1, 100); // Withdraw entire balance</span>
+<span class="nc" id="L73">        assertEquals(result, BankAccount.Status.SUCCESS, &quot;Withdrawal of the exact balance should succeed.&quot;);</span>
+<span class="nc" id="L74">    }</span>
+
+    @Test
+    public void testWithdrawInsufficientFunds() {
+<span class="nc" id="L78">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L79">        BankAccount.Status result = BankAccount.withdraw(1, 150); // Withdraw more than balance</span>
+<span class="nc" id="L80">        assertEquals(result, BankAccount.Status.INSUFFICIENT_FUNDS, &quot;Withdrawal with insufficient funds should fail.&quot;);</span>
+<span class="nc" id="L81">    }</span>
+
+    @Test
+    public void testWithdrawInvalidAmountZero() {
+<span class="nc" id="L85">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L86">        BankAccount.Status result = BankAccount.withdraw(1, 0); // Zero withdrawal</span>
+<span class="nc" id="L87">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Withdrawal of zero should be invalid.&quot;);</span>
+<span class="nc" id="L88">    }</span>
+
+    @Test
+    public void testWithdrawInvalidAmountNegative() {
+<span class="nc" id="L92">        BankAccount.createAccount(100);</span>
+<span class="nc" id="L93">        BankAccount.Status result = BankAccount.withdraw(1, -50); // Negative withdrawal</span>
+<span class="nc" id="L94">        assertEquals(result, BankAccount.Status.INVALID_INPUT, &quot;Withdrawal of negative amount should be invalid.&quot;);</span>
+<span class="nc" id="L95">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

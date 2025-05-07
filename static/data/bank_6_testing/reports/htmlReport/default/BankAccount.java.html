@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankAccount.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BankAccountTestBVA Coverage Results</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">BankAccount.java</span></div><h1>BankAccount.java</h1><pre class="source lang-java linenums">import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class BankAccount {
+
+    private int accountNumber;
+    private int balance;
+
+    // Map to store accounts
+<span class="fc" id="L11">    private static Map&lt;Integer, BankAccount&gt; accounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L12">    private static int nextAccountNumber = 1; // Auto-incrementing account numbers</span>
+
+    // Reset method for testing purposes
+    public static void resetState() {
+<span class="fc" id="L16">        accounts.clear();</span>
+<span class="fc" id="L17">        nextAccountNumber = 1;</span>
+<span class="fc" id="L18">    }</span>
+
+    // Enum for operation statuses
+<span class="fc" id="L21">    public enum Status {</span>
+<span class="fc" id="L22">        SUCCESS,</span>
+<span class="fc" id="L23">        INSUFFICIENT_FUNDS,</span>
+<span class="fc" id="L24">        ACCOUNT_NOT_FOUND,</span>
+<span class="fc" id="L25">        INVALID_INPUT</span>
+    }
+
+    // Constructor
+<span class="fc" id="L29">    private BankAccount(int accountNumber, int initialBalance) {</span>
+<span class="fc" id="L30">        this.accountNumber = accountNumber;</span>
+<span class="fc" id="L31">        this.balance = initialBalance;</span>
+<span class="fc" id="L32">    }</span>
+
+    // Static methods
+
+    public static Status createAccount(int initialBalance) {
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (initialBalance &lt; 0) {</span>
+<span class="fc" id="L38">            return Status.INVALID_INPUT;</span>
+        }
+<span class="fc" id="L40">        int accountNumber = nextAccountNumber++;</span>
+<span class="fc" id="L41">        accounts.put(accountNumber, new BankAccount(accountNumber, initialBalance));</span>
+<span class="fc" id="L42">        System.out.println(&quot;Account created successfully. Account Number: &quot; + accountNumber);</span>
+<span class="fc" id="L43">        return Status.SUCCESS;</span>
+    }
+
+    public static Status deposit(int accountNumber, int depositAmount) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (depositAmount &lt;= 0) {</span>
+<span class="fc" id="L48">            return Status.INVALID_INPUT;</span>
+        }
+<span class="fc" id="L50">        BankAccount account = accounts.get(accountNumber);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L52">            return Status.ACCOUNT_NOT_FOUND;</span>
+        }
+<span class="fc" id="L54">        account.balance += depositAmount;</span>
+<span class="fc" id="L55">        return Status.SUCCESS;</span>
+    }
+
+    public static Status withdraw(int accountNumber, int withdrawAmount) {
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (withdrawAmount &lt;= 0) {</span>
+<span class="fc" id="L60">            return Status.INVALID_INPUT;</span>
+        }
+<span class="fc" id="L62">        BankAccount account = accounts.get(accountNumber);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L64">            return Status.ACCOUNT_NOT_FOUND;</span>
+        }
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (account.balance &lt; withdrawAmount) {</span>
+<span class="fc" id="L67">            return Status.INSUFFICIENT_FUNDS;</span>
+        }
+<span class="fc" id="L69">        account.balance -= withdrawAmount;</span>
+<span class="fc" id="L70">        return Status.SUCCESS;</span>
+    }
+
+    public static Object checkBalance(int accountNumber) {
+<span class="nc" id="L74">        BankAccount account = accounts.get(accountNumber);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L76">            return Status.ACCOUNT_NOT_FOUND;</span>
+        }
+<span class="nc" id="L78">        return account.balance;</span>
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L82">        Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L83">        System.out.println(&quot;Welcome to the Bank Account Management Program!&quot;);</span>
+
+        while (true) {
+<span class="nc" id="L86">            System.out.println(&quot;\nMenu:&quot;);</span>
+<span class="nc" id="L87">            System.out.println(&quot;1. Create Account&quot;);</span>
+<span class="nc" id="L88">            System.out.println(&quot;2. Deposit Money&quot;);</span>
+<span class="nc" id="L89">            System.out.println(&quot;3. Withdraw Money&quot;);</span>
+<span class="nc" id="L90">            System.out.println(&quot;4. Check Balance&quot;);</span>
+<span class="nc" id="L91">            System.out.println(&quot;5. Exit&quot;);</span>
+
+<span class="nc" id="L93">            System.out.print(&quot;Choose an option: &quot;);</span>
+<span class="nc" id="L94">            int choice = scanner.nextInt();</span>
+
+<span class="nc bnc" id="L96" title="All 6 branches missed.">            switch (choice) {</span>
+                case 1:
+<span class="nc" id="L98">                    System.out.print(&quot;Enter initial balance: &quot;);</span>
+<span class="nc" id="L99">                    int initialBalance = scanner.nextInt();</span>
+<span class="nc" id="L100">                    System.out.println(createAccount(initialBalance));</span>
+<span class="nc" id="L101">                    break;</span>
+                case 2:
+<span class="nc" id="L103">                    System.out.print(&quot;Enter account number: &quot;);</span>
+<span class="nc" id="L104">                    int depositAccountNumber = scanner.nextInt();</span>
+<span class="nc" id="L105">                    System.out.print(&quot;Enter deposit amount: &quot;);</span>
+<span class="nc" id="L106">                    int depositAmount = scanner.nextInt();</span>
+<span class="nc" id="L107">                    System.out.println(deposit(depositAccountNumber, depositAmount));</span>
+<span class="nc" id="L108">                    break;</span>
+                case 3:
+<span class="nc" id="L110">                    System.out.print(&quot;Enter account number: &quot;);</span>
+<span class="nc" id="L111">                    int withdrawAccountNumber = scanner.nextInt();</span>
+<span class="nc" id="L112">                    System.out.print(&quot;Enter withdrawal amount: &quot;);</span>
+<span class="nc" id="L113">                    int withdrawAmount = scanner.nextInt();</span>
+<span class="nc" id="L114">                    System.out.println(withdraw(withdrawAccountNumber, withdrawAmount));</span>
+<span class="nc" id="L115">                    break;</span>
+                case 4:
+<span class="nc" id="L117">                    System.out.print(&quot;Enter account number: &quot;);</span>
+<span class="nc" id="L118">                    int balanceAccountNumber = scanner.nextInt();</span>
+<span class="nc" id="L119">                    Object result = checkBalance(balanceAccountNumber);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                    if (result instanceof Integer) {</span>
+<span class="nc" id="L121">                        System.out.println(&quot;Current balance: &quot; + result);</span>
+                    } else {
+<span class="nc" id="L123">                        System.out.println(result);</span>
+                    }
+<span class="nc" id="L125">                    break;</span>
+                case 5:
+<span class="nc" id="L127">                    System.out.println(&quot;Thank you for using the Bank Account Management Program!&quot;);</span>
+<span class="nc" id="L128">                    scanner.close();</span>
+<span class="nc" id="L129">                    return;</span>
+                default:
+<span class="nc" id="L131">                    System.out.println(&quot;Invalid option. Please try again.&quot;);</span>
+            }
+<span class="nc" id="L133">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

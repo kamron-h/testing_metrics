@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BankAccountTestBVA Coverage Results</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">import java.util.Scanner;
+
+<span class="nc" id="L3">public class Main {</span>
+    public static void main(String[] args) {
+<span class="nc" id="L5">        Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L6">        System.out.println(&quot;Welcome to the Simple Bank Account Management Program!&quot;);</span>
+
+        while (true) {
+<span class="nc" id="L9">            System.out.println(&quot;\nMain Menu:&quot;);</span>
+<span class="nc" id="L10">            System.out.println(&quot;1. Create a new account&quot;);</span>
+<span class="nc" id="L11">            System.out.println(&quot;2. Deposit money&quot;);</span>
+<span class="nc" id="L12">            System.out.println(&quot;3. Withdraw money&quot;);</span>
+<span class="nc" id="L13">            System.out.println(&quot;4. Check account balance&quot;);</span>
+<span class="nc" id="L14">            System.out.println(&quot;5. Exit&quot;);</span>
+<span class="nc" id="L15">            System.out.print(&quot;Choose an option: &quot;);</span>
+
+            int choice;
+            try {
+<span class="nc" id="L19">                choice = Integer.parseInt(scanner.nextLine()); // Input validation for integers</span>
+<span class="nc" id="L20">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L21">                System.out.println(&quot;Invalid input. Please enter a number between 1 and 5.&quot;);</span>
+<span class="nc" id="L22">                continue;</span>
+<span class="nc" id="L23">            }</span>
+
+<span class="nc bnc" id="L25" title="All 6 branches missed.">            switch (choice) {</span>
+                case 1: // Create Account
+<span class="nc" id="L27">                    System.out.print(&quot;Enter the initial balance for the account: &quot;);</span>
+                    int initialBalance;
+                    try {
+<span class="nc" id="L30">                        initialBalance = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L31">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L32">                        System.out.println(&quot;Invalid input. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L33">                        continue;</span>
+<span class="nc" id="L34">                    }</span>
+
+<span class="nc" id="L36">                    BankAccount.Status createStatus = BankAccount.createAccount(initialBalance);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">                    if (createStatus == BankAccount.Status.SUCCESS) {</span>
+<span class="nc" id="L38">                        System.out.println(&quot;Account created successfully!&quot;);</span>
+                    } else {
+<span class="nc" id="L40">                        System.out.println(&quot;Failed to create account. Reason: INVALID_INPUT&quot;);</span>
+                    }
+<span class="nc" id="L42">                    break;</span>
+
+                case 2: // Deposit Money
+<span class="nc" id="L45">                    System.out.print(&quot;Enter the account number: &quot;);</span>
+                    int depositAccountNumber;
+                    try {
+<span class="nc" id="L48">                        depositAccountNumber = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L49">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L50">                        System.out.println(&quot;Invalid account number. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L51">                        continue;</span>
+<span class="nc" id="L52">                    }</span>
+
+<span class="nc" id="L54">                    System.out.print(&quot;Enter the deposit amount: &quot;);</span>
+                    int depositAmount;
+                    try {
+<span class="nc" id="L57">                        depositAmount = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L58">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L59">                        System.out.println(&quot;Invalid amount. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L60">                        continue;</span>
+<span class="nc" id="L61">                    }</span>
+
+<span class="nc" id="L63">                    BankAccount.Status depositStatus = BankAccount.deposit(depositAccountNumber, depositAmount);</span>
+<span class="nc" id="L64">                    System.out.println(&quot;Deposit status: &quot; + depositStatus);</span>
+<span class="nc" id="L65">                    break;</span>
+
+                case 3: // Withdraw Money
+<span class="nc" id="L68">                    System.out.print(&quot;Enter the account number: &quot;);</span>
+                    int withdrawAccountNumber;
+                    try {
+<span class="nc" id="L71">                        withdrawAccountNumber = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L72">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L73">                        System.out.println(&quot;Invalid account number. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L74">                        continue;</span>
+<span class="nc" id="L75">                    }</span>
+
+<span class="nc" id="L77">                    System.out.print(&quot;Enter the withdrawal amount: &quot;);</span>
+                    int withdrawAmount;
+                    try {
+<span class="nc" id="L80">                        withdrawAmount = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L81">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L82">                        System.out.println(&quot;Invalid amount. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L83">                        continue;</span>
+<span class="nc" id="L84">                    }</span>
+
+<span class="nc" id="L86">                    BankAccount.Status withdrawStatus = BankAccount.withdraw(withdrawAccountNumber, withdrawAmount);</span>
+<span class="nc" id="L87">                    System.out.println(&quot;Withdrawal status: &quot; + withdrawStatus);</span>
+<span class="nc" id="L88">                    break;</span>
+
+                case 4: // Check Balance
+<span class="nc" id="L91">                    System.out.print(&quot;Enter the account number: &quot;);</span>
+                    int balanceAccountNumber;
+                    try {
+<span class="nc" id="L94">                        balanceAccountNumber = Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L95">                    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L96">                        System.out.println(&quot;Invalid account number. Please enter a valid integer.&quot;);</span>
+<span class="nc" id="L97">                        continue;</span>
+<span class="nc" id="L98">                    }</span>
+
+<span class="nc" id="L100">                    Object balanceResult = BankAccount.checkBalance(balanceAccountNumber);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">                    if (balanceResult instanceof Integer) {</span>
+<span class="nc" id="L102">                        System.out.println(&quot;Account balance: &quot; + balanceResult);</span>
+                    } else {
+<span class="nc" id="L104">                        System.out.println(&quot;Error: &quot; + balanceResult);</span>
+                    }
+<span class="nc" id="L106">                    break;</span>
+
+                case 5: // Exit Program
+<span class="nc" id="L109">                    System.out.println(&quot;Thank you for using the Simple Bank Account Management Program. Goodbye!&quot;);</span>
+<span class="nc" id="L110">                    scanner.close();</span>
+<span class="nc" id="L111">                    return;</span>
+
+                default: // Invalid Choice
+<span class="nc" id="L114">                    System.out.println(&quot;Invalid choice. Please choose a number between 1 and 5.&quot;);</span>
+            }
+<span class="nc" id="L116">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

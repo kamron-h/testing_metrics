@@ -1,0 +1,206 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0">Software Metrics Dashboard</h3>
+</div>
+
+<!-- 1) GitHub URL form -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <form method="post" class="input-group">
+            {% csrf_token %}
+            {{ form.repo_url }}
+            <button type="submit" class="btn btn-primary">Load JaCoCo Metrics</button>
+        </form>
+        {{ form.repo_url.errors }}
+    </div>
+</div>
+
+<!-- 2) Report selector dropdown -->
+{% if report_form %}
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <form method="post" class="input-group">
+            {% csrf_token %}
+            {{ report_form.repo_url }} {# hidden field carrying repo_url #}
+            {{ report_form.report }}
+            <button type="submit" class="btn btn-secondary">Switch Report</button>
+        </form>
+        {{ report_form.report.errors }}
+    </div>
+</div>
+{% endif %}
+
+{% if metrics %}
+<!-- 3) Four Metric Cards -->
+<div class="row mb-4">
+    <!-- Total Instructions -->
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-primary py-2">
+            <div class="card-body">
+                <div class="text-uppercase text-primary fw-bold text-xs mb-1">
+                    Total Instructions
+                </div>
+                <div class="h5 fw-bold text-dark">
+                    {{ metrics.INSTRUCTION.covered|add:metrics.INSTRUCTION.missed }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instruction Coverage % -->
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-success py-2">
+            <div class="card-body">
+                <div class="text-uppercase text-success fw-bold text-xs mb-1">
+                    Instruction Coverage
+                </div>
+                <div class="h5 fw-bold text-dark">
+                    {{ metrics.INSTRUCTION.coverage }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Branch Coverage % -->
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-info py-2">
+            <div class="card-body">
+                <div class="text-uppercase text-info fw-bold text-xs mb-1">
+                    Branch Coverage
+                </div>
+                <div class="h5 fw-bold text-dark">
+                    {{ metrics.BRANCH.coverage }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Coverage % -->
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-warning py-2">
+            <div class="card-body">
+                <div class="text-uppercase text-warning fw-bold text-xs mb-1">
+                    Line Coverage
+                </div>
+                <div class="h5 fw-bold text-dark">
+                    {{ metrics.LINE.coverage }}%
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4) Charts & Graphs -->
+<div class="row">
+    <!-- A) Line Chart: Coverage Trend -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Coverage Trend</div>
+            <div class="card-body">
+                <canvas id="coverageTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- B) Bar Chart: Instruction vs Branch vs Line Coverage -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Coverage Comparison</div>
+            <div class="card-body">
+                <canvas id="coverageBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- C) Doughnut Chart: Instruction Missed vs Covered -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Instruction Covered vs Missed</div>
+            <div class="card-body">
+                <canvas id="instrDoughnutChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Coverage Trend (Line)
+    new Chart(
+        document.getElementById('coverageTrendChart'),
+        {
+            type: 'line',
+            data: {
+                labels: {{ coverage_trend.labels | safe }},
+        datasets: [{
+            label: 'Line Coverage %',
+            data: {{ coverage_trend.data | safe }},
+        fill: true,
+        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+        borderColor: 'rgba(78, 115, 223, 1)',
+        }]
+      },
+        options: {
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true, max: 100 }
+        }
+    }
+    }
+    );
+
+    // Coverage Comparison (Bar)
+    new Chart(
+        document.getElementById('coverageBarChart'),
+        {
+            type: 'bar',
+            data: {
+                labels: ['Instruction', 'Branch', 'Line'],
+                datasets: [{
+                    label: 'Coverage %',
+                    data: [
+                        {{ metrics.INSTRUCTION.coverage }},
+                {{ metrics.BRANCH.coverage }},
+            {{ metrics.LINE.coverage }}
+          ],
+        backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e']
+        }]
+      },
+        options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        scales: {
+            x: { beginAtZero: true, max: 100 }
+        }
+    }
+    }
+    );
+
+    // Instruction Covered vs Missed (Doughnut)
+    new Chart(
+        document.getElementById('instrDoughnutChart'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: ['Covered', 'Missed'],
+                datasets: [{
+                    data: [
+                        {{ metrics.INSTRUCTION.covered }},
+                {{ metrics.INSTRUCTION.missed }}
+          ],
+            backgroundColor: ['#1cc88a', '#e74a3b']
+        }]
+      },
+        options: { maintainAspectRatio: false }
+    }
+    );
+</script>
+{% endblock %}
