@@ -46,12 +46,9 @@ A Django + Bootstrap web dashboard that fetches, downloads and parses JaCoCo HTM
   | 3  | **Doughnut**     | Proportion of Covered vs Missed **Instructions** in a circular doughnut chart.                 |
   | 4  | **Radar**        | Coverage % for all three metrics plotted radially; strengths extend further from the center.    |
   | 5  | **Polar Area**   | Coverage % “sectors” sized by metric; highlights relative proportions in a radial layout.       |
-  | 6  | **Bubble**       | Three bubbles (one per metric) with:  
-    - **x-axis:** Coverage %  
-    - **y-axis:** Missed count  
-    - **radius:** Total count (covered+missed), giving a 3‑D sense of volume. |
+  | 6  | **Bubble**       | Three bubbles (one per metric) with:  x-axis: Coverage %, y-axis: Missed count, radius: Total count (covered+missed), giving a 3‑D sense of volume.
 
----
+
 
 ## Getting Started
 
