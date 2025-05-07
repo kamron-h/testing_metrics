@@ -24,7 +24,7 @@
     <div class="col-lg-6">
         <form method="post" class="input-group">
             {% csrf_token %}
-            {{ report_form.repo_url }} {# hidden field carrying repo_url #}
+            {{ report_form.repo_url }} {# hidden #}
             {{ report_form.report }}
             <button type="submit" class="btn btn-secondary">Switch Report</button>
         </form>
@@ -49,7 +49,6 @@
             </div>
         </div>
     </div>
-
     <!-- Instruction Coverage % -->
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card shadow border-left-success py-2">
@@ -63,7 +62,6 @@
             </div>
         </div>
     </div>
-
     <!-- Branch Coverage % -->
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card shadow border-left-info py-2">
@@ -77,7 +75,6 @@
             </div>
         </div>
     </div>
-
     <!-- Line Coverage % -->
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card shadow border-left-warning py-2">
@@ -93,72 +90,97 @@
     </div>
 </div>
 
-<!-- 4) Charts & Graphs -->
+<!-- 4) Six Charts/Graphs -->
 <div class="row">
-    <!-- A) Line Chart: Coverage Trend -->
+    <!-- 1) Stacked Bar -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
-            <div class="card-header">Coverage Trend</div>
-            <div class="card-body">
-                <canvas id="coverageTrendChart"></canvas>
-            </div>
+            <div class="card-header">Covered vs Missed (Stacked Bar)</div>
+            <div class="card-body"><canvas id="stackedBarChart"></canvas></div>
         </div>
     </div>
-
-    <!-- B) Bar Chart: Instruction vs Branch vs Line Coverage -->
+    <!-- 2) Horizontal Bar -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
-            <div class="card-header">Coverage Comparison</div>
-            <div class="card-body">
-                <canvas id="coverageBarChart"></canvas>
-            </div>
+            <div class="card-header">Coverage % (Bar)</div>
+            <div class="card-body"><canvas id="coverageBarChart"></canvas></div>
         </div>
     </div>
-
-    <!-- C) Doughnut Chart: Instruction Missed vs Covered -->
+    <!-- 3) Doughnut -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
             <div class="card-header">Instruction Covered vs Missed</div>
-            <div class="card-body">
-                <canvas id="instrDoughnutChart"></canvas>
-            </div>
+            <div class="card-body"><canvas id="instrDoughnutChart"></canvas></div>
+        </div>
+    </div>
+    <!-- 4) Radar -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Coverage % (Radar)</div>
+            <div class="card-body"><canvas id="radarChart"></canvas></div>
+        </div>
+    </div>
+    <!-- 5) Polar Area -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Coverage % (Polar Area)</div>
+            <div class="card-body"><canvas id="polarAreaChart"></canvas></div>
+        </div>
+    </div>
+    <!-- 6) Bubble -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header">Coverage vs Missed (Bubble)</div>
+            <div class="card-body"><canvas id="bubbleChart"></canvas></div>
         </div>
     </div>
 </div>
 {% endif %}
-
 {% endblock %}
-
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Coverage Trend (Line)
-    new Chart(
-        document.getElementById('coverageTrendChart'),
-        {
-            type: 'line',
-            data: {
-                labels: {{ coverage_trend.labels | safe }},
-        datasets: [{
-            label: 'Line Coverage %',
-            data: {{ coverage_trend.data | safe }},
-        fill: true,
-        backgroundColor: 'rgba(78, 115, 223, 0.1)',
-        borderColor: 'rgba(78, 115, 223, 1)',
-        }]
-      },
-        options: {
-        maintainAspectRatio: false,
-        scales: {
-            y: { beginAtZero: true, max: 100 }
-        }
-    }
-    }
-    );
+    const instr = {{ metrics.INSTRUCTION| safe }};
+    const branch = {{ metrics.BRANCH| safe }};
+    const line = {{ metrics.LINE| safe }};
 
-    // Coverage Comparison (Bar)
-    new Chart(
+    // helper to isolate errors
+    function safeChart(fn) {
+        try { fn(); } catch (e) { console.error("Chart error:", e); }
+    }
+
+    // 1) Stacked Bar
+    safeChart(() => new Chart(
+        document.getElementById('stackedBarChart'),
+        {
+            type: 'bar',
+            data: {
+                labels: ['Instruction', 'Branch', 'Line'],
+                datasets: [
+                    {
+                        label: 'Covered',
+                        data: [instr.covered, branch.covered, line.covered],
+                        backgroundColor: '#1cc88a'
+                    },
+                    {
+                        label: 'Missed',
+                        data: [instr.missed, branch.missed, line.missed],
+                        backgroundColor: '#e74a3b'
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            }
+        }
+    ));
+
+    // 2) Horizontal Bar
+    safeChart(() => new Chart(
         document.getElementById('coverageBarChart'),
         {
             type: 'bar',
@@ -166,41 +188,96 @@
                 labels: ['Instruction', 'Branch', 'Line'],
                 datasets: [{
                     label: 'Coverage %',
-                    data: [
-                        {{ metrics.INSTRUCTION.coverage }},
-                {{ metrics.BRANCH.coverage }},
-            {{ metrics.LINE.coverage }}
-          ],
-        backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e']
-        }]
-      },
-        options: {
-        indexAxis: 'y',
-        maintainAspectRatio: false,
-        scales: {
-            x: { beginAtZero: true, max: 100 }
+                    data: [instr.coverage, branch.coverage, line.coverage],
+                    backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e']
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true, max: 100 } }
+            }
         }
-    }
-    }
-    );
+    ));
 
-    // Instruction Covered vs Missed (Doughnut)
-    new Chart(
+    // 3) Doughnut
+    safeChart(() => new Chart(
         document.getElementById('instrDoughnutChart'),
         {
             type: 'doughnut',
             data: {
                 labels: ['Covered', 'Missed'],
                 datasets: [{
-                    data: [
-                        {{ metrics.INSTRUCTION.covered }},
-                {{ metrics.INSTRUCTION.missed }}
-          ],
-            backgroundColor: ['#1cc88a', '#e74a3b']
-        }]
-      },
-        options: { maintainAspectRatio: false }
-    }
-    );
+                    data: [instr.covered, instr.missed],
+                    backgroundColor: ['#1cc88a', '#e74a3b']
+                }]
+            },
+            options: { maintainAspectRatio: false }
+        }
+    ));
+
+    // 4) Radar
+    safeChart(() => new Chart(
+        document.getElementById('radarChart'),
+        {
+            type: 'radar',
+            data: {
+                labels: ['Instruction', 'Branch', 'Line'],
+                datasets: [{
+                    label: 'Coverage %',
+                    data: [instr.coverage, branch.coverage, line.coverage],
+                    fill: true,
+                    backgroundColor: 'rgba(28,200,138,0.2)',
+                    borderColor: '#1cc88a'
+                }]
+            },
+            options: { scales: { r: { beginAtZero: true, max: 100 } } }
+        }
+    ));
+
+    // 5) Polar Area
+    safeChart(() => new Chart(
+        document.getElementById('polarAreaChart'),
+        {
+            type: 'polarArea',
+            data: {
+                labels: ['Instruction', 'Branch', 'Line'],
+                datasets: [{
+                    data: [instr.coverage, branch.coverage, line.coverage],
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
+                }]
+            },
+            options: { maintainAspectRatio: false }
+        }
+    ));
+
+    // 6) Bubble
+    safeChart(() => new Chart(
+        document.getElementById('bubbleChart'),
+        {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Instruction',
+                    data: [{ x: instr.coverage, y: instr.missed, r: (instr.covered + instr.missed) / 20 }],
+                    backgroundColor: '#f6c23e'
+                }, {
+                    label: 'Branch',
+                    data: [{ x: branch.coverage, y: branch.missed, r: (branch.covered + branch.missed) / 5 }],
+                    backgroundColor: '#36b9cc'
+                }, {
+                    label: 'Line',
+                    data: [{ x: line.coverage, y: line.missed, r: (line.covered + line.missed) / 20 }],
+                    backgroundColor: '#e74a3b'
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Coverage %' }, min: 0, max: 100 },
+                    y: { title: { display: true, text: 'Missed Count' }, beginAtZero: true }
+                },
+                maintainAspectRatio: false
+            }
+        }
+    ));
 </script>
 {% endblock %}
