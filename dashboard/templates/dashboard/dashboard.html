@@ -1,6 +1,14 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 
+{% block head %}
+<style>
+    #id_report {
+        min-width: 250px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="d-sm-flex justify-content-between align-items-center mb-4">
     <h3 class="text-dark mb-0">Software Metrics Dashboard</h3>
@@ -22,7 +30,7 @@
 {% if report_form %}
 <div class="row mb-4">
     <div class="col-lg-6">
-        <form method="post" class="input-group">
+        <form method="post" class="input-group w-100">
             {% csrf_token %}
             {{ report_form.repo_url }} {# hidden #}
             {{ report_form.report }}
